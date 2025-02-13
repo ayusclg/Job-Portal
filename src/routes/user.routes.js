@@ -1,9 +1,10 @@
 import Router from "router";
 import { Upload } from "../middlewares/multer.middlewares.js";
-import { userRegister } from "../controllers/user.controller.js";
+import { currentUser, userLogin, userRegister } from "../controllers/user.controller.js";
 import Joi from "joi";
 import validator from 'express-joi-validation'
 import fs from 'fs'
+import verifyToken from "../middlewares/auth.middlewares.js";
 
 const router = Router()
 const validate = validator.createValidator()
@@ -39,4 +40,6 @@ router.route("/reg").post(Upload.single("photo"),
 },
     userRegister)
 
+router.route("/login").post(userLogin)
+router.route("/get").get(verifyToken,currentUser)
 export default router
