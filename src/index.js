@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 import userRoutes from './routes/user.routes.js'
 import cookieParser from 'cookie-parser'
 import jobRoutes from './routes/job.routes.js'
+import adminRoutes from './routes/admin.routes.js'
 
 const app = express()
 const port = 3000
@@ -18,7 +19,7 @@ app.use(express.static("public"))
 
 app.use("/auth",userRoutes)
 app.use("/jobs",jobRoutes)
-
+app.use("/admin",adminRoutes)
 
 dotenv.config()
 dbConnect()
