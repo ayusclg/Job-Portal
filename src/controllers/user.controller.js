@@ -1,5 +1,6 @@
 import { User } from "../models/user.models.js"
 import fs from 'fs'
+import jwt from 'jsonwebtoken'
 
 const generateAccessTokenOnly = async(userId)=>{
    try {
@@ -153,4 +154,166 @@ const currentUser = async function (req,res){
     }
 }
 
-export {userRegister,userLogin,currentUser}
+const updateUser = async function (req,res){
+    try {
+        const {name,email,contact,address,} = req.body
+        const update = await User.findByIdAndUpdate(req.user._id,{
+            $set:{
+                name,
+                email,
+                contact,
+                address
+            }},
+            {
+                new:true
+            }
+        ).select("-password -refresh_token")
+        if(!update){
+            return res.status(400).json({
+                message:"Error Updating Details"
+            })
+        }
+        res.status(200).json({
+            message: "Updated User",
+            data:update
+        })
+    } catch (error) {
+        res.status(500).json({
+            message:"Error Updating User"
+        })
+    }
+}
+
+const updatePassword = async(req,res)=>{
+    try {
+        const {oldPassword,newPassword} =req.body
+
+        const user = await User.findById(req.user._id)
+        if(!user){
+            return res.status(500).json({
+                message:"Couldnot Fetch User"
+            })
+        }
+        const isPasswordRight = await user.isPasswordCorrect(oldPassword)
+        if(!isPasswordRight){
+            return res.status(500).json({
+                message:"Incorrect Old Password"
+            })
+        }
+        user.password = newPassword
+        await user.save({validateBeforeSave:false})
+
+        return res.status(200).json({
+            message:"Password Successfully Changed"
+        })
+
+    } catch (error) {
+        res.status(500).json({
+            message:"Error Updating Password"
+        })
+    }
+}
+
+const UpdatePhoto = async(req,res)=>{
+    try {
+        const ExistingPhoto = req.file?.path
+        if(!ExistingPhoto){
+            return res.status(404).json({
+                message:"Couldnot Find Old Photo"
+            })
+        }
+        const newPhotoUrl = `public/images/${req.file.filename}`
+
+        const user = await User.findByIdAndUpdate(req.user._id,{
+            $set:{
+                photo : newPhotoUrl
+            }
+        },
+            {
+                new:true
+            }
+    ).select("-password -refresh_token")
+
+    if(!user){
+        return res.status(500).json({
+            message:"Couldnot Fetch User"
+        })
+    }
+
+    res.status(200).json({
+        message:"New Photo Updated"
+    })
+    } catch (error) {
+        res.status(500).json({
+            message:"Error Updating Photo"
+        })
+    }
+}
+const userLogout = async(req,res)=>{
+    try {
+        const user = await User.findByIdAndUpdate(req.user._id,{
+            $set:{
+                refresh_token: undefined
+            }
+        },
+        {
+            new:true
+        }
+    ).select("-password -refresh_token")
+    const Options = {
+        httpOnly:true,
+        secure:true
+    }
+    res.status(200)
+    .clearCokkie("accesstoken",Options)
+    .clearCokkie("refreshtoken",Options)
+    .json({
+        message:"Logout Successful"
+    })
+
+    } catch (error) {
+        res.status(400).json({
+            message:"Error Logging Out"
+        })
+    }
+}
+
+const refreshTokenAccess = async(req,res)=>{
+    try {
+        const token = req.cookies?.refresh_token
+        if(!token){
+            return res.status(500).json({
+                message:"Token Not Found"
+            })
+        }
+
+        const decodedToken = jwt.verify(token,process.env.REFRESH_TOKEN_SECRET)
+        const user = await User.findById(decodedToken._id)
+        if(!user){
+            return res.status(500).json({
+                message:"Couldnot Access User"
+            })
+        }
+        const accessTokennew = await generateAccessTokenOnly(user._id)
+
+        if(!accessTokennew ){
+            return res.status(500).json({
+                message:"Access  Not Generated"
+            })
+        }
+        const options ={
+            httpOnly:true,
+            secure:true
+        }
+        res.status(200).setCookie('accesstoken',accessTokennew,options)
+        .json({
+            message:"sucessfully new access token created",
+            data:accessTokennew
+        })
+    } catch (error) {
+        res.status(500).json({
+            message:"Couldnot Generate Access Token"
+        })
+    }
+}
+export {userRegister,userLogin,currentUser,updateUser,updatePassword,UpdatePhoto,userLogout,refreshTokenAccess}

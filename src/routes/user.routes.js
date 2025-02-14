@@ -1,6 +1,6 @@
 import Router from "router";
 import { Upload } from "../middlewares/multer.middlewares.js";
-import { currentUser, userLogin, userRegister } from "../controllers/user.controller.js";
+import { currentUser, refreshTokenAccess, updatePassword, UpdatePhoto, updateUser, userLogin, userLogout, userRegister } from "../controllers/user.controller.js";
 import Joi from "joi";
 import validator from 'express-joi-validation'
 import fs from 'fs'
@@ -42,4 +42,9 @@ router.route("/reg").post(Upload.single("photo"),
 
 router.route("/login").post(userLogin)
 router.route("/get").get(verifyToken,currentUser)
+router.route("/update").patch(verifyToken,updateUser)
+router.route("/uPassword").patch(verifyToken,updatePassword)
+router.route("/uPhoto").patch(Upload.single("photo"),verifyToken,UpdatePhoto)
+router.route("/logout").post(verifyToken,userLogout)
+router.route("/newAccess").post(refreshTokenAccess)
 export default router
