@@ -25,7 +25,8 @@ const applicationSchema = new mongoose.Schema({
     method:{
         type:String,
         
-    }
+    },
+    
 }},
     applied_by:{
     type:mongoose.Types.ObjectId,
@@ -33,12 +34,7 @@ const applicationSchema = new mongoose.Schema({
     required:true
     },
 
-    Cv :{
-        type:mongoose.Types.ObjectId,
-        ref:User,
-        
-        
-    }
+    
     
     
 } 
