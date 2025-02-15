@@ -22,7 +22,7 @@ const validateRegisterSchema = Joi.object({
       }),
       roles: Joi.string().valid('admin', 'employer', 'job-seeker').required()
     }).unknown(true)
-router.route("/reg").post(Upload.single("photo"),
+router.route("/reg").post(Upload.single("Cv"),
     async function(req,res,next){
     try {
         await validateRegisterSchema.validateAsync(req.body)
@@ -44,7 +44,7 @@ router.route("/login").post(userLogin)
 router.route("/get").get(verifyToken,currentUser)
 router.route("/update").patch(verifyToken,updateUser)
 router.route("/uPassword").patch(verifyToken,updatePassword)
-router.route("/uPhoto").patch(Upload.single("photo"),verifyToken,UpdatePhoto)
+router.route("/uPhoto").patch(Upload.single("Cv"),verifyToken,UpdatePhoto)
 router.route("/logout").post(verifyToken,userLogout)
 router.route("/newAccess").post(refreshTokenAccess)
 export default router

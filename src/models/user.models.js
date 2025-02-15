@@ -33,7 +33,7 @@ const userSchema = new mongoose.Schema({
             refresh_token:{
                 type:String
             },
-            photo:{
+            Cv:{
                 type:String,
                 required:true
             }

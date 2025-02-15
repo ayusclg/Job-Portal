@@ -31,6 +31,10 @@ import mongoose from "mongoose";
         type:mongoose.Types.ObjectId,
         ref:"User"
         
+    },
+    appliedBy:{
+        type:Number,
+        default: 0
     }
  },{timestamps:true})
 

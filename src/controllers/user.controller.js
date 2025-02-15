@@ -38,7 +38,7 @@ const userRegister = async function (req,res){
             
         }
 
-        const photoUrl = `/public/images/${req.file.filename}`
+        const CvUrl = `/public/images/${req.file.filename}`
 
         const user = await User.create({
             name,
@@ -47,7 +47,7 @@ const userRegister = async function (req,res){
             contact,
             address,
             roles,
-            photo:  photoUrl
+            Cv:CvUrl
         })
         console.log(user)
         if(!user){
@@ -282,15 +282,15 @@ const refreshTokenAccess = async(req,res)=>{
     try {
         const token = req.cookies?.refresh_token
         if(!token){
-            return res.status(500).json({
+            return res.status(404).json({
                 message:"Token Not Found"
             })
         }
 
         const decodedToken = jwt.verify(token,process.env.REFRESH_TOKEN_SECRET)
-        const user = await User.findById(decodedToken._id)
+        const user = await User.findById(decodedToken?._id)
         if(!user){
-            return res.status(500).json({
+            return res.status(400).json({
                 message:"Couldnot Access User"
             })
         }
