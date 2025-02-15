@@ -21,7 +21,7 @@ const applyJob = async(req,res)=>{
             req.body.apply.name = jobApplied.title;
             req.body.apply.location = jobApplied.location;
             req.body.apply.salary = jobApplied.salary;
-            req.body.apply.type = jobApplied.type;
+            req.body.apply.method = jobApplied.type;
 
        
         const create = await kaam.create({
@@ -40,7 +40,7 @@ const applyJob = async(req,res)=>{
                 message:"Job Application Failed"
             })
         }
-        const appliedJob = await kaam.findById(create._id).populate("applied_by","name")
+        const appliedJob = await kaam.findById(create._id)
 
         res.status(200).json({
             message:"Successfully Applied",

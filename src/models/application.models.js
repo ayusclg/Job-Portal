@@ -4,6 +4,7 @@ import { User } from "./user.models.js";
 
 const applicationSchema = new mongoose.Schema({
     apply:{
+        type:{
         job_id:{
         type: mongoose.Types.ObjectId,
         ref: Job,
@@ -21,11 +22,11 @@ const applicationSchema = new mongoose.Schema({
         type:String,
         
     },
-    type:{
+    method:{
         type:String,
         
     }
-},
+}},
     applied_by:{
     type:mongoose.Types.ObjectId,
     ref:User,
