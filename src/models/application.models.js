@@ -33,7 +33,10 @@ const applicationSchema = new mongoose.Schema({
     ref:User,
     required:true
     },
-
+    Cv :{
+        type:String,
+        
+    }
     
     
     

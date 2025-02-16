@@ -1,3 +1,4 @@
+import { log } from "console"
 import { kaam } from "../models/application.models.js"
 import { Job } from "../models/job.models.js"
 import { User } from "../models/user.models.js"
@@ -7,6 +8,7 @@ import mongoose from "mongoose"
 const applyJob = async(req,res)=>{
     try {
         const user = await User.findById(req.user._id)
+        console.log("users",user)
         if(!user.roles == "job-seeker"){
           
             return res.status(403).json({
@@ -17,18 +19,21 @@ const applyJob = async(req,res)=>{
         const jobApplied = await Job.findById(req.body.apply.job_id)
         
 
-            req.body.apply.job_id=jobApplied._id
-            req.body.apply.name = jobApplied.title;
-            req.body.apply.location = jobApplied.location;
-            req.body.apply.salary = jobApplied.salary;
-            req.body.apply.method = jobApplied.type;
-            
+        req.body.apply = {
+            job_id: jobApplied._id,
+            name: jobApplied.title,
+            location: jobApplied.location,
+            salary: jobApplied.salary,
+            method: jobApplied.type,
+          };
+      
 
        
         const create = await kaam.create({
 
             apply:req.body.apply,
             applied_by:req.user._id,
+            Cv :user.Cv
              
         })
         if(!create){
@@ -41,7 +46,7 @@ const applyJob = async(req,res)=>{
                 message:"Job Application Failed"
             })
         }
-        const appliedJob = await kaam.findById(create._id)
+        const appliedJob = await kaam.findById(create._id).populate("applied_by","name")
 
         res.status(200).json({
             message:"Successfully Applied",
